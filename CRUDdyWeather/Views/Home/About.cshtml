@@ -1,6 +1,27 @@
 ﻿@{
     ViewData["Title"] = "About Project";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>I promise I don't want your cookies.</p>
+<div id="wrapper"style="display:flex; flex-direction:row">
+    <div class="sideNav" style="display:flex; flex-direction:column">
+        <h1>Project Toolbox</h1>
+        <ul>
+            <li><a href="#CSHARP">C# and Visual Studio</a></li>
+            <li><a href="#DOTNET">ASP.NET</a></li>
+            <li><a href="#CRUD">CRUD Database</a></li>
+            <li><a href="#API">OpenWeatherMaps API</a></li>
+            <li><a href="#WEB">HTML and CSS</a></li>
+    
+        </ul>
+    </div>
+
+    <div class="aboutContent">
+        <h1>@ViewData["Title"]</h1>
+
+        <h2 id="CSHARP">C# </h2>
+        <h2 id="DOTNET">ASP.NET (MVC)</h2>
+        <h2 id="CRUD">CRUD</h2>
+        <h2 id="API">OpenWeatherMaps API</h2>
+        <h2 id="WEB">HTML and CSS</h2>
+    </div>
+</div>

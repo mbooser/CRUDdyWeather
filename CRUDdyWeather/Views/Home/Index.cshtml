@@ -4,7 +4,38 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Search a location to get the current weather.</p>
+    <p>Search a location to get the current weather and store in our CRUD database.</p>
+</div>
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inputModal">
+    New Search
+</button>
+<!-- Modal -->
+<div class="modal fade" id="inputModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Enter Location Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="modalForm">
+                    <div class="mb-3">
+                        <label for="stNumber" class="form-label">Building Number</label>
+                        <input type="number" class="form-control" id="stNumber" name="stNumber" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="stName" class="form-label">Street Name</label>
+                        <input type="text" class="form-control" id="stName" name="stName" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="container" style="display:flex; padding:15px; border-spacing:15px;">
@@ -18,4 +49,10 @@
        </tr>
    </table>
 
+   <div id="mapBox" style="height:300px;width:300px;background-color:gold">
+
+   </div>
+
 </div>
+
+
