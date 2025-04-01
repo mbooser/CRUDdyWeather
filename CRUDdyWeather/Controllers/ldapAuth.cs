@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace CRUDdyWeather.Models
+namespace CRUDdyWeather.Controllers
 {
     public class ldapAuth : Controller
     {
