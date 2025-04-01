@@ -27,9 +27,16 @@ namespace CRUDdyWeather.Controllers
             return View();
         }
 
-        public IActionResult ShowModal()
+        [HttpPost]
+        public IActionResult SubmitForm(string Name, string Email)
         {
-            return View();
+            if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Email))
+            {
+                return BadRequest("Invalid data");
+            }
+
+            // Process form data (save to database, etc.)
+            return Json(new { success = true, message = "Data submitted successfully!" });
         }
 
 

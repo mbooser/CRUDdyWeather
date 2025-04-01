@@ -55,4 +55,25 @@
 
 </div>
 
+<script>
+    $(document).ready(function() {
+        $("#modalForm").submit(function(event) {
+            event.preventDefault(); // Prevent normal form submission
+
+            $.ajax({
+                url: '@Url.Action("SubmitForm", "YourController")',
+                type: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    alert("Form submitted successfully!");
+                    $('#inputModal').modal('hide'); // Close modal
+                },
+                error: function() {
+                    alert("Error submitting form.");
+                }
+            });
+        });
+    });
+</script>
+
 
