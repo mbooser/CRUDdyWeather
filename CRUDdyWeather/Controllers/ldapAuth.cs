@@ -1,30 +1,51 @@
-﻿using AspNetCore.LdapAuthentication;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using CRUDdyWeather.Services;
 
-namespace CRUDdyWeather.Controllers
+public class AccountController : Controller
 {
-    public class ldapAuth : Controller
+    private readonly LdapAuthService _ldapAuthService;
+
+    public AccountController(LdapAuthService ldapAuthService)
     {
-        [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        _ldapAuthService = ldapAuthService;
+    }
+
+    [HttpGet]
+    public IActionResult Login()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Login(string username, string password)
+    {
+        if (_ldapAuthService.Authenticate(username, password))
         {
-            var result = await HttpContext.AuthenticateAsync(); //Incomplete Function, Missing Parameters
-            if (result.Succeeded)
+            var claims = new List<Claim>
             {
-                var claims = new List<Claim> { new Claim(ClaimTypes.Name, username) };
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties { IsPersistent = true };
+                new Claim(ClaimTypes.Name, username)
+            };
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity), authProperties);
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties();
 
-                return RedirectToAction("Index", "Home");
-            }
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity), authProperties);
 
-            return View("LoginFailed");
+            return RedirectToAction("Index", "Home");
         }
+
+        ViewBag.Error = "Invalid username or password";
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToAction("Login");
     }
 }

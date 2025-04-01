@@ -26,6 +26,10 @@ namespace CRUDdyWeather.Controllers
         {
             return View();
         }
+        public IActionResult Login()
+        {
+            return View();
+        }
 
         [HttpPost]
         public IActionResult SubmitForm(string Name, string Email)
