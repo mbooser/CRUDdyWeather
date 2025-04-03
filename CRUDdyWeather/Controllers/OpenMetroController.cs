@@ -2,7 +2,7 @@
 
 namespace CRUDdyWeather.Controllers
 {
-    public class HomeController1 : Controller
+    public class OpenMetroController : Controller
     {
         public IActionResult Index()
         {
