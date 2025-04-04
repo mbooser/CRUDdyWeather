@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using CRUDdyWeather.Enums;
 using CRUDdyWeather.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,9 +33,9 @@ namespace CRUDdyWeather.Controllers
         }
 
         [HttpPost]
-        public IActionResult SubmitForm(string Name, string Email)
+        public IActionResult SubmitForm(string Name, string Email, ForcastType type)
         {
-            if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Email))
+            if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(type.ToString()))
             {
                 return BadRequest("Invalid data");
             }

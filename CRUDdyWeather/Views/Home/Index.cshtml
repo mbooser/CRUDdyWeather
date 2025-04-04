@@ -26,20 +26,20 @@
                     
                     <!-- Get GeoCords from User -->
                     <div class="mb-3">
-                        <label for="Latitude" class="form-label">Building Number</label>
+                        <label for="Latitude" class="form-label">Latitude</label>
                         <input type="number" class="form-control" id="Latitude" name="Latitude" step=".000001" min="-90" max="90" required>
                     </div>
                     <div class="mb-3">
-                        <label for="Longitude" class="form-label">Street Name</label>
+                        <label for="Longitude" class="form-label">Longitude</label>
                         <input type="number" class="form-control" id="Longitude" name="Longitude" step=".000001" min="-180" max="180" required>
                     </div>
 
                     <!-- GetForcast Option from User-->
                     <div class="mb-3">
                         <p>Please select a forcast type:</p>
-                        <input type="radio" id="hourly" name="SearchType" value="hourly" required/> 
+                        <input type="radio" id="hourly" name="SearchType" value="Hourly" required/> 
                         <label for="SearchType" class="form-label">Hourly</label>
-                        <input type="radio" id="daily" name="SearchType" value="daily"/>
+                        <input type="radio" id="daily" name="SearchType" value="Daily"/>
                         <label for="SearchType" class="form-label">Daily</label>
                         
                     </div>
@@ -65,10 +65,7 @@
        </tr>
    </table>
 
-   <div id="mapBox" style="height:300px;width:300px;background-color:gold">
-
-   </div>
-
+ 
 </div>
 
 <script>
