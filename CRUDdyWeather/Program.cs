@@ -1,7 +1,12 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using CRUDdyWeather.Services; // Import the namespace for LdapAuthService
+using CRUDdyWeather.Services;
+using CRUDdyWeather.Models; // Import the namespace for LdapAuthService
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Enable WatchDogAPI as a Singleton/Sentinal
+builder.Services.AddSingleton<UrlCaller>();
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

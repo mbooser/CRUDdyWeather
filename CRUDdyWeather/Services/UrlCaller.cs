@@ -8,12 +8,12 @@ namespace CRUDdyWeather.Services
     public class UrlCaller
     {
         /// <summary>
-        /// 
+        /// Builds URL Request from User Input
         /// </summary>
         /// <param name="lat"></param>
         /// <param name="lng"></param>
         /// <param name="type"></param>
-        /// <returns></returns>
+        /// <returns>Completed API URL</returns>
         /// <exception cref="ArgumentException"></exception>
         public static string UrlBuilder(double lat, double lng, ForcastType type)
         {
@@ -25,7 +25,7 @@ namespace CRUDdyWeather.Services
             switch (type)
             {
                 case ForcastType.Current:
-                    //Assumed Behavior
+                    //Assumed Behavior does nothing. Prevents error on default.
                     break;
                 case ForcastType.Daily:
                     output += "&daily=weather_code,temperature_2m_max,temperature_2m_mean,wind_speed_10m_max,wind_speed_10m_min,wind_speed_10m_mean,relative_humidity_2m_mean,relative_humidity_2m_max,relative_humidity_2m_min,temperature_2m_min";
@@ -56,7 +56,6 @@ namespace CRUDdyWeather.Services
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"Request error: {e.Message}");
                 throw new HttpRequestException("Failed to Contact API\n"+e.Message);
             }
         }
