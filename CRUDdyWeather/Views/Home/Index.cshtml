@@ -11,7 +11,6 @@
     New Search
 </button>
 <!-- Search Modal -->
-<!-- TODO: Make Alt Tab/View For Address Search -->
 <div class="modal fade" id="inputModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -22,30 +21,36 @@
             </div>
 
             <div class="modal-body">
-                <form id="modalForm">
-                    
-                    <!-- Get GeoCords from User -->
+                <form id="modalForm" method="post" action="/Home/SubmitForm">
                     <div class="mb-3">
-                        <label for="Name" class="form-label">Search Name</label>
-                        <input type="text" class="form-control" id="Name" name="name">
-                    </div>
-                    <div class="mb-3">
-                        <label for="Latitude" class="form-label">Latitude</label>
-                        <input type="number" class="form-control" id="Latitude" name="Latitude" step=".000001" min="-90" max="90" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="Longitude" class="form-label">Longitude</label>
-                        <input type="number" class="form-control" id="Longitude" name="Longitude" step=".000001" min="-180" max="180" required>
+                        <label for="name" class="form-label">Location Name</label>
+                        <input type="text" id="name" name="Name" class="form-control" required />
                     </div>
 
-                    <!-- GetForcast Option from User-->
                     <div class="mb-3">
-                        <p>Please select a forcast type:</p>
-                        <input type="radio" id="hourly" name="SearchType" value="Hourly" required/> 
-                        <label for="SearchType" class="form-label">Hourly</label>
-                        <input type="radio" id="daily" name="SearchType" value="Daily"/>
-                        <label for="SearchType" class="form-label">Daily</label>
-                        
+                        <label for="latitude" class="form-label">Latitude</label>
+                        <input type="number" id="latitude" name="Lat" class="form-control" min="-90" max="90" step=".000001" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="longitude" class="form-label">Longitude</label>
+                        <input type="number" id="longitude" name="Lng" class="form-control"min="-180"max="180" step=".000001" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <p>Please select a forecast type:</p>
+                        <div>
+                            <input type="radio" id="current" name="Ftype" value="Current" required />
+                            <label for="current" class="form-label">Current</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="daily" name="Ftype" value="Daily" />
+                            <label for="daily" class="form-label">Daily</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="hourly" name="Ftype" value="Hourly" />
+                            <label for="hourly" class="form-label">Hourly</label>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
@@ -53,44 +58,116 @@
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
 </div>
 
 <div class="container" style="display:flex; padding:15px; border-spacing:15px;">
-   <table id="records">
-       <tr id="topRow">
-           <th>Location</th>
-           <th>Time</th>
-           <th>Weather</th>
-           <th>Temperature (F)</th>
-           <th>Interact</th>
-       </tr>
-   </table>
-
- 
+    <table id="records" class="table">
+        <tr id="topRow">
+            <th>Name</th>
+            <th>Lat</th>
+            <th>Lng</th>
+            <th>Time</th>
+            <th>Weather</th>
+            <th>Temperature (F)</th>
+            <th>Humidity</th>
+            <th>Interact</th>
+        </tr>
+    </table>
 </div>
 
 <script>
-    $(document).ready(function() {
-        $("#modalForm").submit(function(event) {
-            event.preventDefault(); // Prevent normal form submission
+    function weatherCodeToString(code) {
+        switch (parseInt(code, 10)) {
+            case 0: return "Clear Skies";
+            case 1: return "Mainly Clear";
+            case 2: return "Partly Cloudy";
+            case 3: return "Overcast";
+            case 45: return "Fog";
+            case 46: return "Depositing Rime Fog";
+            case 51: return "Drizzle Light";
+            case 53: return "Drizzle Moderate";
+            case 55: return "Drizzle Dense";
+            case 56: return "Freezing Drizzle Light";
+            case 57: return "Freezing Drizzle Dense";
+            case 61: return "Rain Slight";
+            case 63: return "Rain Moderate";
+            case 65: return "Rain Heavy";
+            case 66: return "Freezing Rain Light";
+            case 67: return "Freezing Rain Heavy";
+            case 71: return "Snow Slight";
+            case 73: return "Snow Moderate";
+            case 75: return "Snow Heavy";
+            case 77: return "Snow Grains";
+            case 80: return "Rain Showers Slight";
+            case 81: return "Rain Showers Moderate";
+            case 82: return "Rain Showers Violent";
+            case 85: return "Snow Showers Slight";
+            case 86: return "Snow Showers Heavy";
+            case 95: return "Thunderstorm Slight or Moderate";
+            case 96: return "Thunderstorm with Slight Hail";
+            case 99: return "Thunderstorm with Heavy Hail";
+            default: return "Unknown";
+        }
+    }
+
+    $(document).ready(function () {
+        // Handle form submission
+        $("#modalForm").submit(function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            var formData = $(this).serialize();
 
             $.ajax({
-                url: '@Url.Action("SubmitForm", "YourController")',
+                url: '@Url.Action("SubmitForm", "Home")',
                 type: "POST",
-                data: $(this).serialize(),
-                success: function(response) {
-                    alert("Form submitted successfully!");
-                    $('#inputModal').modal('hide'); // Close modal
+                data: formData,
+                success: function (response) {
+                    const name = response.name;
+                    const lat = response.lat;
+                    const lng = response.lng;
+                    const time = new Date().toLocaleString();
+
+                    // Parse embedded JSON payload
+                    const raw = JSON.parse(response.dumpJSON);
+                    const current = raw.current;
+
+                    const weather = weatherCodeToString(current.weather_code);
+                    const temperature = current.temperature_2m;
+                    const humidity = current.relative_humidity_2m;
+
+                    // Append a new row to the table
+                    $('#records').append(`
+                        <tr>
+                            <td>${name}</td>
+                            <td>${lat}</td>
+                            <td>${lng}</td>
+                            <td>${time}</td>
+                            <td>${weather}</td>
+                            <td>${temperature}°</td>
+                            <td>${humidity}%</td>
+                            <td><button class="btn btn-info delete-row">Delete</button></td>
+                        </tr>
+                    `);
+
+                    // Hide modal and reset form
+                    $('#yourModalId').modal('hide');
+                    $('#modalForm')[0].reset();
                 },
-                error: function() {
+                error: function (xhr, status, error) {
+                    console.error("Error details:", error);
                     alert("Error submitting form.");
                 }
             });
         });
+
+        // Handle delete button clicks using event delegation
+        $('#records').on('click', '.delete-row', function () {
+            $(this).closest('tr').remove();
+        });
     });
 </script>
-
 

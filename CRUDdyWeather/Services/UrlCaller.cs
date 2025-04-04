@@ -1,4 +1,5 @@
-﻿using CRUDdyWeather.Enums;
+﻿using System.Text.Json;
+using CRUDdyWeather.Enums;
 
 
 namespace CRUDdyWeather.Services
@@ -30,9 +31,10 @@ namespace CRUDdyWeather.Services
         public static string UrlBuilder(double lat, double lng, ForcastType type)
         {
             string output = "https://api.open-meteo.com/v1/forecast?";
+            Console.WriteLine("URL Builder Called" + output);
             output += "latitude=" + lat.ToString();
             output += "&longitude=" + lng.ToString();
-            output += "&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m";
+            output += "&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&temperature_unit=fahrenheit";
 
             switch (type)
             {
@@ -48,7 +50,7 @@ namespace CRUDdyWeather.Services
                 default:
                     throw new ArgumentException("Failed to Parse Forcast Type");
             }
-
+            Console.WriteLine("URL Builder Called "+output);
             return output;
         }
 
@@ -59,6 +61,7 @@ namespace CRUDdyWeather.Services
         /// <returns>JSON Object as String</returns>
         public async Task<string> FetchJSON(string completeUrl)
         {
+            Console.WriteLine("FetchJSON Called Start");
             // Ensure thread-safe access to the state before making the request
             await CheckAndUpdateStateAsync();
 
@@ -78,7 +81,7 @@ namespace CRUDdyWeather.Services
 
                 // Increment count safely inside the semaphore lock
                 Count++;
-
+                Console.WriteLine("FetchJSON Called " + output);
                 return output;
             }
             catch (HttpRequestException e)
@@ -113,6 +116,112 @@ namespace CRUDdyWeather.Services
             {
                 // Always release the semaphore when done
                 _semaphore.Release();
+            }
+            
+        }
+        public static string parseResponse(string json, ForcastType type, string key)
+        {
+            try
+            {
+                // Parse the JSON
+                JsonDocument doc = JsonDocument.Parse(json);
+
+                // Check if the specific ForcastType exists in the JSON document
+                if (doc.RootElement.TryGetProperty(type.ToString().ToLower(), out JsonElement typeElement))
+                {
+                    // Try to get the key property, returning null if it doesn't exist
+                    if (typeElement.TryGetProperty(key, out JsonElement keyElement))
+                    {
+                        return keyElement.ToString();  // Return the value as a string
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Key '{key}' not found in the '{type}' forecast.");
+                        return "Key not found";
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"ForcastType '{type}' not found in the response.");
+                    return "ForcastType not found";
+                }
+            }
+            catch (JsonException e)
+            {
+                // Catch any JSON-specific exceptions and log the error
+                Console.WriteLine($"JSON parsing failed: {e.Message}");
+                return "Failed to parse JSON";
+            }
+            catch (Exception e)
+            {
+                // Catch any other exceptions that might occur
+                Console.WriteLine($"Unexpected error: {e.Message}");
+                return "Unexpected error occurred";
+            }
+        }
+
+        public static string ParseWeather_Code(string responseVal)
+        {
+            switch(int.Parse(responseVal))
+            {
+                case 0:
+                    return "Clear Skies";
+                case 1:
+                    return "Mainly Clear";
+                case 2:
+                    return "Partly Cloudy";
+                case 3:
+                    return "Overcast";
+                case 45:
+                    return "Fog";
+                case 46:
+                    return "Depositing Rime Fog";
+                case 51:
+                    return "Drizzle Light";
+                case 53:
+                    return "Drizzle Moderate";
+                case 55:
+                    return "Drizzle Dense";
+                case 56:
+                    return "Freezing Drizzel Light";
+                case 57:
+                    return "Freezing Drizzel Dense";
+                case 61:
+                    return "Rain Slight";
+                case 63:
+                    return "Rain Moderate";
+                case 65:
+                    return "Rain Heavy";
+                case 66:
+                    return "Freezing Rain Light";
+                case 67:
+                    return "Freezing Rain Heavy";
+                case 71:
+                    return "Snow Slight";
+                case 73:
+                    return "Snow Moderate";
+                case 75:
+                    return "Snow Heavy";
+                case 77:
+                    return "Snow Grains";
+                case 80:
+                    return "Rain Showers Slight";
+                case 81:
+                    return "Rain Showers Moderate";
+                case 82:
+                    return "Rain Showers Violent";
+                case 85:
+                    return "Snow Showers Slight";
+                case 86:
+                    return "Snow Showers Heavy";
+                case 95:
+                    return "Thunderstorm Slight or Moderate";
+                case 96:
+                    return "Thunderstorm with Slight Hail";
+                case 99:
+                    return "Thunderstorm with Heavy Hail";
+                default:
+                    return "Failed to Parse Int";
             }
         }
     }

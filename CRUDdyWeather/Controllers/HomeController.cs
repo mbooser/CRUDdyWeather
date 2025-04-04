@@ -3,6 +3,7 @@ using CRUDdyWeather.Enums;
 using CRUDdyWeather.Models;
 using CRUDdyWeather.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace CRUDdyWeather.Controllers
 {
@@ -53,14 +54,42 @@ namespace CRUDdyWeather.Controllers
             // Fetch JSON data from the API
             string jsonData = await _urlCaller.FetchJSON(url);
 
-            // Store the data in the SearchEntity model
-            searchEntity.DumpJSON = jsonData; // Assuming DumpJSON stores the weather data
+            // Store the raw JSON data in the SearchEntity
+            searchEntity.DumpJSON = jsonData;
 
-            // Optionally, store searchEntity in the database (not shown here)
-
-            // Return the updated model to the view
-            return View("Index", searchEntity);  // Pass the updated model back to the main page
+            // Return the ViewModel to the view for rendering
+            return Json(searchEntity);
         }
+
+        private void ParseWeatherData(WeatherViewModel viewModel, string jsonData)
+        {
+            switch (viewModel.Ftype)
+            {
+                default:
+                    viewModel.CurrentWeather.Temperature = UrlCaller.parseResponse(jsonData, viewModel.Ftype, "temperature_2m");
+                    viewModel.CurrentWeather.WindSpeed = UrlCaller.parseResponse(jsonData, viewModel.Ftype, "wind_speed_10m");
+                    viewModel.CurrentWeather.WeatherDescription = UrlCaller.ParseWeather_Code(UrlCaller.parseResponse(jsonData, viewModel.Ftype, "weather_code"));
+                    viewModel.CurrentWeather.Humidity = UrlCaller.parseResponse(jsonData, viewModel.Ftype, "relative_humidity_2m");
+                    Console.WriteLine("Parsed Current - Temp = "+viewModel.CurrentWeather.Temperature+" Wind Speed = "+viewModel.CurrentWeather.WindSpeed+" Weather = "+viewModel.CurrentWeather.WeatherDescription+" Humidity = "+viewModel.CurrentWeather.Humidity);
+                    break;
+            }
+            if (viewModel.Ftype == ForcastType.Current)
+            {
+                // Parse the current weather data from JSON
+                viewModel.CurrentWeather = JsonConvert.DeserializeObject<CurrentWeather>(jsonData);
+            }
+            else if (viewModel.Ftype == ForcastType.Daily)
+            {
+                // Parse the daily forecast data from JSON
+                viewModel.DailyForecasts = JsonConvert.DeserializeObject<List<DailyForecast>>(jsonData);
+            }
+            else if (viewModel.Ftype == ForcastType.Hourly)
+            {
+                // Parse the hourly forecast data from JSON
+                viewModel.HourlyForecasts = JsonConvert.DeserializeObject<List<HourlyForecast>>(jsonData);
+            }
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
