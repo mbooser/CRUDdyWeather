@@ -1,26 +1,18 @@
-﻿using CRUDdyWeather.Controllers;
-using CRUDdyWeather.Enums;
-using CRUDdyWeather.Services;
-
-namespace CRUDdyWeather.Models;
+﻿using CRUDdyWeather.Enums;
 
 public class SearchEntity
 {
-    private double Lat { get; set; }
-    private double Lng { get; set; }
-    private ForcastType Ftype { get; set; }
-    private string? DumpJSON { get; set; }
+    public string Name { get; set; }
+    public double Lat { get; set; }
+    public double Lng { get; set; }
+    public ForcastType Ftype { get; set; }
+    public string DumpJSON { get; set; }
 
     public SearchEntity(double lat, double lng, ForcastType type)
     {
         this.Lat = lat;
         this.Lng = lng;
         this.Ftype = type;
-        this.DumpJSON = UrlCaller.UrlBuilder(lat,lng,type);
-       
+        this.DumpJSON = "";
     }
 }
-
-   
-
-

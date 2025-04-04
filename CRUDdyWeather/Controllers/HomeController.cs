@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using CRUDdyWeather.Enums;
 using CRUDdyWeather.Models;
+using CRUDdyWeather.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRUDdyWeather.Controllers
@@ -8,12 +9,16 @@ namespace CRUDdyWeather.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly UrlCaller _urlCaller;
 
-        public HomeController(ILogger<HomeController> logger)
+        // Injecting UrlCaller to handle API calls
+        public HomeController(ILogger<HomeController> logger, UrlCaller urlCaller)
         {
             _logger = logger;
+            _urlCaller = urlCaller;
         }
 
+        // GET: Home/Index
         public IActionResult Index()
         {
             return View();
@@ -23,27 +28,39 @@ namespace CRUDdyWeather.Controllers
         {
             return View();
         }
+
         public IActionResult About()
         {
             return View();
         }
+
         public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult SubmitForm(string Name, string Email, ForcastType type)
+        public async Task<IActionResult> SubmitForm(SearchEntity searchEntity)
         {
-            if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(type.ToString()))
+            if (string.IsNullOrEmpty(searchEntity.Name) || searchEntity.Lat == 0 || searchEntity.Lng == 0 || searchEntity.Ftype == null)
             {
                 return BadRequest("Invalid data");
             }
 
-            // Process form data (save to database, etc.)
-            return Json(new { success = true, message = "Data submitted successfully!" });
-        }
+            // Build the URL based on the submitted data
+            string url = UrlCaller.UrlBuilder(searchEntity.Lat, searchEntity.Lng, searchEntity.Ftype);
 
+            // Fetch JSON data from the API
+            string jsonData = await _urlCaller.FetchJSON(url);
+
+            // Store the data in the SearchEntity model
+            searchEntity.DumpJSON = jsonData; // Assuming DumpJSON stores the weather data
+
+            // Optionally, store searchEntity in the database (not shown here)
+
+            // Return the updated model to the view
+            return View("Index", searchEntity);  // Pass the updated model back to the main page
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
