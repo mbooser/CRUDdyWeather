@@ -14,7 +14,8 @@ Search Type is an Enum used by the UrlCaller Service for determining which forca
 
 ________________________________________________________________________________________________________
 
-Known Issues
+Known Issues:
+
 Form incorrectly Parses Enum from form >> Disabled Values besides current;
 Data layer incomplete >> All data currently stored in memory;
 Detail View not called correctly >> Removed from cleaned copy of the codebase/
