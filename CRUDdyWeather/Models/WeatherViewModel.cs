@@ -1,5 +1,10 @@
 ﻿using CRUDdyWeather.Enums;
 
+
+/// <summary>
+/// Vestigial Function for displaying data
+/// All functionality could likely be rolled into the regular searchentity class
+/// </summary>
 public class WeatherViewModel
 {
     public string Name { get; set; }

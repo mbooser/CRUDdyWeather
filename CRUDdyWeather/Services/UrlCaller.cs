@@ -95,7 +95,10 @@ namespace CRUDdyWeather.Services
             }
         }
 
-        // Check and update the state in a thread-safe manner using SemaphoreSlim
+        /// <summary>
+        /// Checks Date with an async lock to protect against race conditions.
+        /// </summary>
+        /// <returns></returns>
         private async Task CheckAndUpdateStateAsync()
         {
             // Wait to enter the critical section
@@ -105,20 +108,29 @@ namespace CRUDdyWeather.Services
             {
                 string today = DateTime.UtcNow.ToString("yyyy-MM-dd");
 
-                // If it's a new day, reset the count
+                // Reset Date + Count on a new day
                 if (Date != today)
                 {
                     Date = today;
-                    Count = 0; // Reset count for the new day
+                    Count = 0;
                 }
             }
             finally
             {
-                // Always release the semaphore when done
+                // Release async lock
                 _semaphore.Release();
             }
             
         }
+        /// <summary>
+        /// Parses SearchEntity.DumpJSON for Field/Value "KEY"
+        /// ForcastType will tell which section of JSON to Search.
+        /// All API Calls will request CURRENT and up to one additonal type.
+        /// </summary>
+        /// <param name="json"></param>
+        /// <param name="type"></param>
+        /// <param name="key"></param>
+        /// <returns>Value of the JSON Key Pair</returns>
         public static string parseResponse(string json, ForcastType type, string key)
         {
             try
@@ -159,7 +171,14 @@ namespace CRUDdyWeather.Services
                 return "Unexpected error occurred";
             }
         }
-
+        /// <summary>
+        /// API Returns an integer representing a type of weather.
+        /// Function matches the integer to the appropriate type of weather.
+        /// 
+        /// Similar functionality copied over to Index.cshtml script block.
+        /// </summary>
+        /// <param name="responseVal"></param>
+        /// <returns>Weather Description as String</returns>
         public static string ParseWeather_Code(string responseVal)
         {
             switch(int.Parse(responseVal))

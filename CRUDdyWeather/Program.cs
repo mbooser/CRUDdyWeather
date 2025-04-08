@@ -11,8 +11,6 @@ builder.Services.AddSingleton<UrlCaller>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Register LDAP Authentication Service
-builder.Services.AddScoped<LdapAuthService>();
 
 // Configure Authentication & Authorization
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

@@ -30,17 +30,13 @@ namespace CRUDdyWeather.Controllers
             return View();
         }
 
-        public IActionResult About()
-        {
-            return View();
-        }
-
-        public IActionResult Login()
-        {
-            return View();
-        }
 
         [HttpPost]
+        
+        ///<summary>
+        ///
+        ///</summary>
+        ///
         public async Task<IActionResult> SubmitForm(SearchEntity searchEntity)
         {
             if (string.IsNullOrEmpty(searchEntity.Name) || searchEntity.Lat == 0 || searchEntity.Lng == 0 || searchEntity.Ftype == null)
@@ -57,7 +53,7 @@ namespace CRUDdyWeather.Controllers
             // Store the raw JSON data in the SearchEntity
             searchEntity.DumpJSON = jsonData;
 
-            // Return the ViewModel to the view for rendering
+            // Return the searchEntity the view for script
             return Json(searchEntity);
         }
 

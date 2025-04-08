@@ -1,5 +1,10 @@
 ﻿using CRUDdyWeather.Enums;
 
+/// <summary>
+/// Model for holding basic data of a search
+/// Variety of Forcast is determined by ForcastType Enum
+/// All data stored in DumpJSON for later parsing.
+/// </summary>
 public class SearchEntity
 {
     public string Name { get; set; } = "";
